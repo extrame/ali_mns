@@ -52,7 +52,7 @@ const (
 	DELETE        = "DELETE"
 )
 
-type MNSClient interface {
+type Client interface {
 	Send(method Method, headers map[string]string, message interface{}, resource string) (*fasthttp.Response, error)
 	SetProxy(url string)
 
@@ -74,9 +74,9 @@ type aliMNSClient struct {
 	clientLocker sync.Mutex
 }
 
-func NewAliMNSClient(inputUrl, accessKeyId, accessKeySecret string) MNSClient {
+func NewClient(inputUrl, accessKeyId, accessKeySecret string) (Client, error) {
 	if inputUrl == "" {
-		panic("ali-mns: message queue url is empty")
+		return nil, errors.New("ali-mns: message queue url is empty")
 	}
 
 	credential := NewAliMNSCredential(accessKeySecret)
@@ -87,13 +87,13 @@ func NewAliMNSClient(inputUrl, accessKeyId, accessKeySecret string) MNSClient {
 
 	var err error
 	if cli.url, err = neturl.Parse(inputUrl); err != nil {
-		panic("err parse url")
+		return nil, fmt.Errorf("err parse url (%v)", err)
 	}
 
 	// 1. parse region and accountid
 	pieces := strings.Split(inputUrl, ".")
 	if len(pieces) != 5 {
-		panic("ali-mns: message queue url is invalid")
+		return nil, errors.New("ali-mns: message queue url is invalid")
 	}
 
 	accountIdSlice := strings.Split(pieces[0], "/")
@@ -109,7 +109,7 @@ func NewAliMNSClient(inputUrl, accessKeyId, accessKeySecret string) MNSClient {
 	// 2. now init http client
 	cli.initFastHttpClient()
 
-	return cli
+	return cli, nil
 }
 
 func (p aliMNSClient) getAccountID() (accountId string) {

@@ -9,12 +9,12 @@ import (
 	"github.com/gogap/errors"
 )
 
-type AliMNSTopic interface {
+type Topic interface {
 	Name() string
 	GenerateQueueEndpoint(queueName string) string
 	GenerateMailEndpoint(mailAddress string) string
 
-	PublishMessage(message MessagePublishRequest) (resp MessageSendResponse, err error)
+	PublishMessage(message MessagePublishRequest) (resp Response, err error)
 
 	Subscribe(subscriptionName string, message MessageSubsribeRequest) (err error)
 	SetSubscriptionAttributes(subscriptionName string, notifyStrategy notifyStrategyType) (err error)
@@ -25,13 +25,13 @@ type AliMNSTopic interface {
 
 type MNSTopic struct {
 	name    string
-	client  MNSClient
+	client  Client
 	decoder MNSDecoder
 
 	qpsMonitor *QPSMonitor
 }
 
-func NewMNSTopic(name string, client MNSClient, qps ...int32) AliMNSTopic {
+func NewTopic(name string, client Client, qps ...int32) Topic {
 	if name == "" {
 		panic("ali_mns: topic name could not be empty")
 	}
@@ -61,7 +61,7 @@ func (p *MNSTopic) GenerateMailEndpoint(mailAddress string) string {
 	return "mail:directmail:" + mailAddress
 }
 
-func (p *MNSTopic) PublishMessage(message MessagePublishRequest) (resp MessageSendResponse, err error) {
+func (p *MNSTopic) PublishMessage(message MessagePublishRequest) (resp Response, err error) {
 	p.qpsMonitor.checkQPS()
 	_, err = send(p.client, p.decoder, POST, nil, message, fmt.Sprintf("topics/%s/%s", p.name, "messages"), &resp)
 	return

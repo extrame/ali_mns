@@ -19,7 +19,7 @@ type AliTopicManager interface {
 }
 
 type MNSTopicManager struct {
-	cli     MNSClient
+	cli     Client
 	decoder MNSDecoder
 }
 
@@ -31,7 +31,7 @@ func checkTopicName(topicName string) (err error) {
 	return
 }
 
-func NewMNSTopicManager(client MNSClient) AliTopicManager {
+func NewMNSTopicManager(client Client) AliTopicManager {
 	return &MNSTopicManager{
 		cli:     client,
 		decoder: NewAliMNSDecoder(),

@@ -77,3 +77,7 @@ var (
 	ERR_MNS_QUEUE_ALREADY_EXIST_AND_HAVE_SAME_ATTR = errors.TN(ALI_MNS_ERR_NS, 133, "mns queue already exist, and the attribute is the same, queue name: {{.name}}")
 	ERR_MNS_BATCH_OP_FAIL                          = errors.TN(ALI_MNS_ERR_NS, 136, "mns queue batch operation fail")
 )
+
+func IsError(err error, tn errors.ErrCodeTemplate) bool {
+	return tn.IsEqual(err)
+}

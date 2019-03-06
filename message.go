@@ -35,7 +35,7 @@ type ErrorResponse struct {
 	HostId    string   `xml:"HostId,omitempty" json:"host_id,omitempty"`
 }
 
-type MessageSendRequest struct {
+type Request struct {
 	XMLName      xml.Name `xml:"Message" json:"-"`
 	MessageBody  string   `xml:"MessageBody" json:"message_body"`
 	DelaySeconds int64    `xml:"DelaySeconds" json:"delay_seconds"`
@@ -98,8 +98,8 @@ func (m *MailAttributes) MarshalJSON() ([]byte, error) {
 }
 
 type BatchMessageSendRequest struct {
-	XMLName  xml.Name             `xml:"Messages"`
-	Messages []MessageSendRequest `xml:"Message"`
+	XMLName  xml.Name  `xml:"Messages"`
+	Messages []Request `xml:"Message"`
 }
 
 type ReceiptHandles struct {
@@ -115,7 +115,7 @@ type MessageSubsribeRequest struct {
 	NotifyContentFormat notifyContentFormatType `xml:"NotifyContentFormat,omitempty"`
 }
 
-type MessageSendResponse struct {
+type Response struct {
 	MessageResponse
 	MessageId      string `xml:"MessageId" json:"message_id"`
 	MessageBodyMD5 string `xml:"MessageBodyMD5" json:"message_body_md5"`
@@ -233,24 +233,20 @@ type SetSubscriptionAttributesRequest struct {
 	NotifyStrategy notifyStrategyType `xml:"NotifyStrategy,omitempty" json:"notify_strategy,omitempty"`
 }
 
-type Queue struct {
-	QueueURL string `xml:"QueueURL" json:"url"`
-}
-
 type Queues struct {
-	XMLName    xml.Name `xml:"Queues" json:"-"`
-	Queues     []Queue  `xml:"Queue" json:"queues"`
-	NextMarker string   `xml:"NextMarker" json:"next_marker"`
-}
-
-type Topic struct {
-	TopicURL string `xml:"TopicURL" json:"url"`
+	XMLName xml.Name `xml:"Queues" json:"-"`
+	Queues  []struct {
+		QueueURL string `xml:"QueueURL" json:"url"`
+	} `xml:"Queue" json:"queues"`
+	NextMarker string `xml:"NextMarker" json:"next_marker"`
 }
 
 type Topics struct {
-	XMLName    xml.Name `xml:"Topics" json:"-"`
-	Topics     []Topic  `xml:"Topic" json:"topics"`
-	NextMarker string   `xml:"NextMarker" json:"next_marker"`
+	XMLName xml.Name `xml:"Topics" json:"-"`
+	Topics  []struct {
+		TopicURL string `xml:"TopicURL" json:"url"`
+	} `xml:"Topic" json:"topics"`
+	NextMarker string `xml:"NextMarker" json:"next_marker"`
 }
 
 type Subscription struct {
